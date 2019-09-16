@@ -1,5 +1,7 @@
 import numpy
+import numpy.random as npr
 import random
+from math import trunc
 
 max_fitness = 28
 
@@ -8,7 +10,7 @@ def main():
     qtFitness = 0
 
     #Gera a população
-    for i in range(200):
+    for i in range(100):
         a = random.sample(range(1,9), 8)
         if a not in population:
             fitn = fitness(a)
@@ -20,8 +22,6 @@ def main():
             for u in range(8):
                 binaryArray[u] = '{0:03b}'.format(b[u])
             print "Genótipo " + str(i) + ":" + str(binaryArray)
-        else:
-            i = i - 1
 
     population.sort(key=takeSecond,reverse=True)
 
@@ -30,8 +30,8 @@ def main():
         probMutNumber = random.randint(1,10)
 
         if (probRecombNumber > 0) and (probRecombNumber < 10):
-            firstEl = population[0]
-            secondEl = population[1]
+            firstEl = roulletteSelection(population)
+            secondEl = roulletteSelection(population)
             childs = reproduce(firstEl[0], secondEl[0])
             fitness1 = fitness(childs[0])
             fitness2 = fitness(childs[1])
@@ -42,7 +42,7 @@ def main():
             population.sort(key=takeSecond, reverse=True)
 
         if(probMutNumber > 0) and (probMutNumber < 5):
-            firstEl = population[0]
+            firstEl = roulletteSelection(population)
             child = mutate(firstEl[0])
             fitn = fitness(child)
             qtFitness += 1
@@ -83,8 +83,12 @@ def fitness(individual):
                 dy = abs(individual[i] - individual[j])
                 if (dx == dy):
                     clashes += 1
-    print max_fitness - clashes
-    return max_fitness - clashes
+
+    fitns = max_fitness - clashes
+    if(fitns < 0):
+        fitns = 0
+
+    return fitns
 
 def mutate(x):
     n = len(x)
@@ -98,6 +102,13 @@ def mutate(x):
     x[c] = m
     x[a] = t
     return x
+
+def mutateByInversion(x):
+    n = len(x)
+    firstPosition = random.randint(0, n - 2)
+    secondPosition = random.randint(firstPosition, n - 1)
+
+    return x[0:firstPosition] + (x[firstPosition:secondPosition])[::-1] + x[secondPosition:len(x)]
 
 def reproduce(x, y):
     n = len(x)
@@ -155,6 +166,11 @@ def excludeBad(finalList, elements):
 
 def takeSecond(elem):
     return elem[1]
+
+def roulletteSelection(population):
+    max = sum([c[1] for c in population])
+    selection_probs = [float(c[1])/float(max) for c in population]
+    return population[npr.choice(len(population), p=selection_probs)]
 
 if __name__ == '__main__':
     main()
