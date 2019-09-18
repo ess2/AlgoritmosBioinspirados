@@ -1,71 +1,90 @@
 import numpy
 import random
+import time
 
 max_fitness = 28
+qt_exec = 20
+qt_population = 200
 
 def main():
-    population = list()
-    qtFitness = 0
+    for f in range(qt_exec):
+        inicio = time.time()
+        population = list()
+        qtFitness = 0
 
-    #Gera a população
-    for i in range(200):
-        a = random.sample(range(1,9), 8)
-        if a not in population:
-            fitn = fitness(a)
-            qtFitness += 1
-            tuple = (a, fitn)
-            population.append(tuple)
-            binaryArray = ['', '', '', '', '', '', '', '']
-            b = numpy.array(tuple[0])
-            for u in range(8):
-                binaryArray[u] = '{0:03b}'.format(b[u])
-            print "Genótipo " + str(i) + ":" + str(binaryArray)
-        else:
-            i = i - 1
+        #Gera a população
+        for i in range(qt_population):
+            a = random.sample(range(1,9), 8)
+            if a not in population:
+                fitn = fitness(a)
+                qtFitness += 1
+                tuple = (a, fitn)
+                population.append(tuple)
+                binaryArray = ['', '', '', '', '', '', '', '']
+                b = numpy.array(tuple[0])
+                for u in range(8):
+                    binaryArray[u] = '{0:03b}'.format(b[u])
+                #print "Genótipo " + str(i) + ":" + str(binaryArray)
+            else:
+                i = i - 1
 
-    population.sort(key=takeSecond,reverse=True)
+        population.sort(key=takeSecond,reverse=True)
+    #(population[0])[1] < max_fitness
+        while (qtFitness < 10000):
+            probRecombNumber = random.randint(1,10)
+            probMutNumber = random.randint(1,10)
 
-    while ((population[0])[1] < max_fitness and qtFitness < 10000):
-        probRecombNumber = random.randint(1,10)
-        probMutNumber = random.randint(1,10)
+            if (probRecombNumber > 0) and (probRecombNumber < 10):
+                firstEl = population[0]
+                secondEl = population[1]
+                childs = reproduce(firstEl[0], secondEl[0])
+                fitness1 = fitness(childs[0])
+                fitness2 = fitness(childs[1])
+                qtFitness += 2
+                tuple = (childs[0], fitness1)
+                tuple2 = (childs[1], fitness2)
+                population = excludeBad(population, [tuple, tuple2])
+                population.sort(key=takeSecond, reverse=True)
 
-        if (probRecombNumber > 0) and (probRecombNumber < 10):
-            firstEl = population[0]
-            secondEl = population[1]
-            childs = reproduce(firstEl[0], secondEl[0])
-            fitness1 = fitness(childs[0])
-            fitness2 = fitness(childs[1])
-            qtFitness += 2
-            tuple = (childs[0], fitness1)
-            tuple2 = (childs[1], fitness2)
-            population = excludeBad(population, [tuple, tuple2])
-            population.sort(key=takeSecond, reverse=True)
+            if(probMutNumber > 0) and (probMutNumber < 5):
+                firstEl = population[0]
+                child = mutate(firstEl[0])
+                fitn = fitness(child)
+                qtFitness += 1
+                tuple = (child, fitn)
+                population = excludeBad(population, [tuple])
+                population.sort(key=takeSecond, reverse=True)
 
-        if(probMutNumber > 0) and (probMutNumber < 5):
-            firstEl = population[0]
-            child = mutate(firstEl[0])
-            fitn = fitness(child)
-            qtFitness += 1
-            tuple = (child, fitn)
-            population = excludeBad(population, [tuple])
-            population.sort(key=takeSecond, reverse=True)
+        binaryArray = ['','','','','','','','']
+        #print "Melhor Solução:"
+        #element = population[0]
 
-    binaryArray = ['','','','','','','','']
-    print "Melhor Solução:"
-    element = population[0]
+        #a = numpy.array(element[0])
 
-    a = numpy.array(element[0])
+        #for i in range(8):
+        #    binaryArray[i] = '{0:03b}'.format(a[i])
 
-    for i in range(8):
-        binaryArray[i] = '{0:03b}'.format(a[i])
+        #print binaryArray
 
-    print binaryArray
+        #print "Fitness:"
+        #print (population[0])[1]
 
-    print "Fitness:"
-    print (population[0])[1]
+        #print "Número de avaliações de fitness:" + str(qtFitness)
 
-    print "Número de avaliações de fitness:"
-    print qtFitness
+
+        qtMaxFit = 0
+        for i in range(len(population)):
+            if (population[i])[1] == max_fitness:
+                qtMaxFit += 1
+            else:
+                break
+
+        print "Quantidade de indíviduos que atingiram o fitness máximo:" + str(qtMaxFit)
+        fim = time.time()
+
+        print "Tempo de Execução " + str(f) + ": " + str((fim - inicio))
+        print "################################################################"
+
 
 def fitness(individual):
     clashes = 0;
@@ -83,7 +102,7 @@ def fitness(individual):
                 dy = abs(individual[i] - individual[j])
                 if (dx == dy):
                     clashes += 1
-    print max_fitness - clashes
+    #print max_fitness - clashes
     return max_fitness - clashes
 
 def mutate(x):

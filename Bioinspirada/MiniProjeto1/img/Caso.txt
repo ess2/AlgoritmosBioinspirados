@@ -1,0 +1,17 @@
+Avaliações:
+
+Mostrar:
+	- Tempo de Execução
+	- Quantidade de indivíduos que convergiram na população até 10.000 iterações de fitness
+	- 
+Tamanho da população: 100 escolha pelo pior
+
+	1) Mutação Simples, Crossover simples, seleção pelo melhores pais, escolha pelo pior
+	2) Mutação Simples, Crossover simples, seleção pela roleta, escolha pelo pior
+	3) Mutação Inversa, Crossover simples, seleção pelo melhores pais, escolha pelo pior
+	4) Mutação Inversa, Crossover simples, seleção pela roleta, escolha pelo pior
+	5) Mutação Simples, cross over one, melhor pai
+	6) Mutação Inversa, cross over one, melhor pai
+	7) Mutação Simples, cross over one, seleção roleta
+	8) Mutação Inversa, cross over one, seleção roleta
+
